@@ -42,7 +42,7 @@ Além disso, o operador pipe será introduzido, operador esse fundamental para s
 * Operador Pipe, para que serve e como utilizar
 
 
-## Aula 2: Carregando Conjunto e Limpeza Inical de dados e um tibble
+## Aula 2: Carregando Conjunto e Limpeza Inicial de dados e um tibble
 
 Nessa segunda aula os pacote de carregamentos de dados readr e readxl serão introduzidos, o pacote janitor será utilizado para uma limpeza inicial dos dados, e o data.frame do tidyverse, chamado de tibble será introduzido, onde abordaremos as principais diferenças entre um data.frame, um tibble e data.table
 
