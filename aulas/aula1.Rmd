@@ -1,0 +1,407 @@
+---
+title: "Aula 1 - Motivação e o Operador Pipe"
+format:
+  html:
+    theme: united
+    toc: true
+    toc-title: Conteúdo
+    number-sections: true
+    embed-resources: true
+    minimal: true
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+# O Tidyverse
+
+
+Bem-vindo ao nosso minicurso de Fundamentos de Processamento de Dados Utilizando o Tidyverse! 
+
+
+O Tidyverse é uma coleção de pacotes R projetados para facilitar a manipulação, visualização e análise de dados de forma eficaz e consistente. Este curso foi elaborado para oferecer a você uma compreensão sólida dos princípios fundamentais do Tidyverse e das técnicas para limpeza, organização e análise de dados.
+
+Ao longo deste minicurso, você terá a oportunidade de aprender os conceitos centrais do Tidyverse, começando com o uso do pacote dplyr para realizar operações de manipulação de dados de maneira intuitiva, utilizando o operador pipe (|>) para encadear comandos. Em seguida, exploraremos o pacote tidyr e tibble para modificação e processamento de dados. Além disso, abordaremos conceitos essenciais do Tidyverse, como o padrão de dados "tidy" e a filosofia de "verbos" para manipulação de dados.
+
+Nosso objetivo é capacitar você a se sentir confiante na utilização do Tidyverse para explorar, limpar e transformar conjuntos de dados, preparando-os para análises avançadas,visualizações informativas e modelos de qualquer natureza. Este minicurso é adequado para pessoas com um conhecimento prévio no R ou para aqueles que desejam aprimorar suas habilidades de manipulação de dados usando o Tidyverse.
+
+
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/tidyverse_pacotes.png){width=50%}
+
+# Tidy Workflow
+
+Os pacotes que utilizam a metodologia tidy de programação não se limitam apenas a parte de limpeza e organização de dados.
+
+O processo de: Coleta, limpeza, organização, exploração, modelagem e entrega pode ser toda realizada utilizando os pacotes do tidyverse, no processo que é conhecido como tidy workflow
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/workflow.png){width=100%}
+
+O objetivo desse minicurso é introduzir os alunos a primeira etapa desse processo: Leitura, limpeza e organização dos dados, parte essa que é a pedra angular de todos os projetos de análises e modelagens.
+
+Tal etapa se caracteriza pelo tempo que pode ser gasto, onde em diversos contextos, a tarefa de limpeza e organização de dados necessita de um tempo maior que etapas como análise exploratória e modelagem
+
+Os principais pacotes dessa etapa são: **readr, readxl, janitor, dplyr, tidyr e tibble.** e esses serão os pacotes trabalhados nesse curso
+
+
+## Ggplot
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/ggplot_alisson.png){width=80%}
+
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
+-----------------------
+
+Pacote de construção gráfica do tidyverse
+
+* [Ggplot Website](https://ggplot2.tidyverse.org/)
+
+* [Ggplot2: Elegant Graphics for Data Analysis (3e)](https://ggplot2-book.org/)
+
+## Tidymodels
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/tidymodels_img.png){width=40%}
+
+------------------
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/parssnip.png){width=80%}
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
+-----------------
+
+Framework para modelagem, possuindo desde modelos de regressão linear simples, até bayesianos, MLGs, aprendizado de máquina e redes neurais
+
+* [Tidymodels Website](https://www.tidymodels.org/)
+
+* [Tidy Modeling with R](https://www.tmwr.org/)
+
+## Tidyverts
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/fpp3.jfif){width=70%}
+
+Pacotes do framework FPP3 para organização e modelagem de dados de Séries Temporais
+
+
+* [Tidyverts Website](https://tidyverts.org/)
+
+* [Forecasting: Principles and Practice](https://otexts.com/fpp3/)
+
+# |> O Pipe
+
+Se trata de um operador extremamente simples, que surgiu no pacote **magrittr** como " %>% " com o intuito de encadear funções em sequência.
+
+Se você utiliza o R partir da versão 4.1.0, não há mais a necessidade de se carregar o pacote para sua utilização, onde o pipe " |> " já vem baixado com o software.
+
+Ele possui a função de pegar o argumento a esquerda (Left Hand Side, LHS) e jogar no primeiro argumento da função a direita (Right Hand Side, RHS), na forma:
+
+```{r, eval=F}
+# Seja LHS um objeto e RHS uma função
+
+LHS |>
+  RHS()
+```
+
+
+Ao executar o código, LHS seria utilizado no primeiro argumento da função RHS, ou seja:
+
+```{r, eval=F}
+RHS(LHS)
+```
+
+Normalmente, chamamos uma função e depois seu argumento:
+
+```{r}
+a = 2
+
+print(a)
+```
+
+O pipe muda tal sequência, chamando o argumento da função antes da função em si:
+
+```{r}
+a |> 
+  print()
+```
+
+Portanto, escrever: "print(a)" e "a |> print()" são as mesmas coisas para o R
+
+#################
+
+O seguinte exemplo foi retirado do livro [Ciência de Dados em R](https://livro.curso-r.com/index.html) escrito pela a equipe do [Curso R](https://curso-r.com/)
+
+```{r, eval = F}
+# Receita de bolo sem pipe. Tente entender o que é preciso fazer.
+
+esfrie(
+  asse(
+    coloque(
+      bata(
+        acrescente(
+          recipiente(
+            rep("farinha", 2), 
+            "água", 
+            "fermento", 
+            "leite", 
+            "óleo"
+          ), 
+          "farinha", 
+          ate = "macio"
+        ), 
+        duracao = "3min"
+      ), 
+      lugar = "forma", 
+      tipo = "grande", 
+      untada = TRUE
+    ), 
+    duracao = "50min"
+  ), 
+  lugar = "geladeira", 
+  duracao = "20min"
+)
+```
+
+
+
+O mesmo código escrito com o pipe
+
+```{r, eval = F}
+recipiente(rep("farinha", 2), "água", "fermento", "leite", "óleo") |>
+  acrescente("farinha", ate = "macio") |>
+  bata(duracao = "3min") |>
+  coloque(lugar = "forma", tipo = "grande", untada = TRUE) |>
+  asse(duracao = "50min") |>
+  esfrie(lugar = "geladeira", duracao = "20min")
+```
+
+## Identação Tidy
+
+O pipe tem como principal motivação a escrita de um código limpo de se escrever e ler
+
+Ao se encadear funções, ação recorrente ao se trabalhar com funções do tidyverse, a não utilização do pipe acarretaria em códigos confusos e poluidos visualmente
+
+Exemplo: Dado um data.frame, calcule o raiz quadrada do valor absoluto da soma dos elementos desse data.frame
+
+```{r}
+df_exemplo1 = data.frame('a' = c(1,2,3),
+                         'b' = c(4,5,6),
+                         'c' = c(7,8,9))
+
+sqrt(abs(sum(a)))
+```
+
+O encadeamento de funções dificulta a leitura de terceiros do seu código, e pode prejudicar o próprio autor, onde a procura de erros se torna uma tarefa mais complexa e extensa
+
+
+O mesmo código pode ser escrito utilizando o pipe:
+
+```{r}
+a |>
+  sum() |>
+  abs() |>
+  sqrt()
+```
+
+
+##################
+
+Problemas de identação, escrita e leitura de código escalam rapidamente ao se utilizar as funções do tidyverse
+
+Exemplo: O seguinte data.frame possui dados sobre furacões no oceano Atlântico
+
+```{r}
+dplyr::storms |>
+ rmarkdown::paged_table()
+```
+
+Suponha a seguinte tarefa
+
+Retorne apenas as observações entre os anos de 1976 e 1977, na cidade de Clara, organizando a tabela pela variável 'pressão da tempestade' em ordem descresente, removenda as colunas NAs
+
+(As funções utilizadas serão introduzidas em aulas futuras)
+
+```{r}
+library(dplyr)
+
+
+rmarkdown::paged_table(arrange(filter(janitor::remove_empty(dplyr::storms, which = 'cols'), 
+               name == 'Clara' & (year > 1975 & year < 1978)), 
+        desc(pressure)))
+
+
+```
+
+Esse mesmo código pode ser escrito com o pipe:
+
+```{r}
+dplyr::storms |>
+  janitor::remove_empty(which = 'cols') |>
+  dplyr::filter(name == 'Clara' & (year > 1975 & year < 1978)) |>
+  dplyr::arrange(dplyr::desc(pressure)) |>
+  rmarkdown::paged_table()
+```
+
+Ao se utilizar o pipe, a sequência lógica de filtragem, e organização das observações se mostra mais fácil de se observar. Além disso, sendo um código menos poluido visualmente, a procura de erros é otimizada 
+
+
+# Funções Anônimas (Funções Lambdas)
+
+Uma das vantagens do pipe é ligar objetos a funções, onde as funções utilizadas não precisam ser do tidyverse ou de outro pacote, você mesmo pode declarar as funções que deseja encadear via pipe
+
+Funções anônimas (também chamadas de *funções lambda*) em R não são funções nomeadas de um pacote ou escritas por você e **armazenadas em um objeto de função**. Elas são criadas dinamicamente, aplicadas imediatamente e não persistem após o uso
+
+* Funções em R, podem ser declaradas como
+
+```{r, eval=F}
+nome_funcao = function(argumeto_1, argumento_2, ..., argumento_n){
+  #Conteudo da Função
+}
+```
+
+Onde a função **nome_funcao** será armazenada na memória do ambiente utilizado para aquele projeto R
+
+Funções anônimas não são declaradas e armazenadas, o programador à cria quando for necessário
+
+São usadas da seguinte maneira
+
+```{r, eval = F}
+objeto |>
+  {\(x) #oq deseja fazer com o objeto
+    }()
+```
+
+Ou seja, o **objeto** está sendo passado para o primeiro argumento da função anônima, chamado de x
+
+Como a função não fica armazenada após a execução de sua linha de código, ela é eficiente em gereciamento de memória 
+
+* Exemplo 1 
+  + Dado um vetor de 5 números, retorne a soma dos seus elementos ao quadrado
+  
+```{r}
+c(1:5) |>
+  {\(x) x^2}() |>
+  sum()
+
+## OU
+
+c(1:5) |>
+  {\(x) x^2 |>
+      sum()}() 
+```
+
+
+
+* Exemplo 2
+  + Dado algum modelo linear, retorne quais variáveis tiveram um p-valor abaixo de 5%
+  
+```{r}
+lm(mpg ~ qsec + hp + cyl + am, data = mtcars) |>
+  summary() |>
+  {\(x) x$coefficients}() |>
+  {\(x) x[,4] < 0.05}()
+  
+
+```
+
+
+A utilização de funções anônimas facilita o encadeamento de funções antes de ser necessário o armazenamento em um objeto
+
+# Desafio 1 - Familiarizando com Pipe
+
+## A 
+
+Reescreva a seguinte sequência de funções utilizando o pipe e se necessário uma função anônima
+
+```{r}
+round(mean(sum(1:10)/3), digits = 1)
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Possível Resposta"
+
+(1:10) |>
+  {\(x) x/3}() |>
+  sum() |>
+  mean() |>
+  round(1)
+```
+
+
+## B
+
+Sem rodar, diga qual a saída do código abaixo. Consulte o help das funções caso precise.
+
+```{r}
+mtcars |>
+{\(x)
+  x$mpg |>
+    max() |>
+  {\(y) y/10}()  
+}()
+
+```
+
+
+```{r, eval = F}
+#| code-fold: true
+#| code-summary: "Possível Resposta"
+
+O código utilizado retorna o valor máximo da variável mpg do conjunto de dados mtcars divido por 10
+```
+
+## C
+
+Encontre o erro no seguinte código
+
+```{r, eval = F}
+dplyr::storms |>
+  {\(x) x$year} |>
+  sort()
+```
+
+```{r, eval = F}
+#| code-fold: true
+#| code-summary: "Possível Resposta"
+
+Está faltando um "()" no final da função anônima
+```
+
+
+
+
+# Referências
+
+* Curso-R. Ciência de Dados em R [recurso eletrônico]. São Paulo: Curso-R, 2022. Disponível em: [https://livro.curso-r.com/index.html](https://livro.curso-r.com/index.html).
+
+* ENGEL, Cody. Data Wrangling with R [recurso eletrônico]. 1. ed. Disponível em: [https://cengel.github.io/R-data-wrangling/](https://cengel.github.io/R-data-wrangling/)
+
+* WICKHAM, Hadley; GROLEMUND, Garrett. R for Data Science [recurso eletrônico]. Disponível em: [https://r4ds.had.co.nz/index.html](https://r4ds.had.co.nz/index.html).
+
+
+----------------------------
+
+
+<style>
+/* Custom CSS for footer */
+footer {
+    text-align: center;
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+footer img {
+    max-width: 150px; /* Adjust width as needed */
+    height: auto;
+}
+</style>
+
+
+
+<footer>
+    <img src="D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/footer.png" alt="Footer Image">
+</footer>
