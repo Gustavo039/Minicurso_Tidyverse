@@ -190,7 +190,7 @@ df_exemplo1 = data.frame('a' = c(1,2,3),
                          'b' = c(4,5,6),
                          'c' = c(7,8,9))
 
-sqrt(abs(sum(a)))
+sqrt(abs(sum(df_exemplo1)))
 ```
 
 O encadeamento de funções dificulta a leitura de terceiros do seu código, e pode prejudicar o próprio autor, onde a procura de erros se torna uma tarefa mais complexa e extensa
@@ -199,7 +199,7 @@ O encadeamento de funções dificulta a leitura de terceiros do seu código, e p
 O mesmo código pode ser escrito utilizando o pipe:
 
 ```{r}
-a |>
+df_exemplo1 |>
   sum() |>
   abs() |>
   sqrt()
@@ -289,7 +289,7 @@ c(1:5) |>
 
 c(1:5) |>
   {\(x) x^2 |>
-      sum()}() 
+      sum()}()
 ```
 
 

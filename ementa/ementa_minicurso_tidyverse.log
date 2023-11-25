@@ -1,11 +1,11 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.11.3)  13 NOV 2023 21:35
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.11.22)  24 NOV 2023 15:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **ementa_minicurso_tidyverse.tex
 (./ementa_minicurso_tidyverse.tex
 LaTeX2e <2023-11-01>
-L3 programming layer <2023-11-01>
+L3 programming layer <2023-11-09>
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size12.clo
@@ -131,9 +131,9 @@ LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2022/02/03 v1.0f TeX engine tests
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/unicode-math/unicode-math.sty (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3kernel/expl3.sty
-Package: expl3 2023-11-01 L3 programming layer (loader) 
+Package: expl3 2023-11-09 L3 programming layer (loader) 
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-xetex.def
-File: l3backend-xetex.def 2023-10-23 L3 backend support: XeTeX
+File: l3backend-xetex.def 2023-11-09 L3 backend support: XeTeX
 \g__graphics_track_int=\count268
 \l__pdf_internal_box=\box53
 \g__pdf_backend_object_int=\count269
@@ -178,24 +178,24 @@ LaTeX Font Info:    Redeclaring font encoding TS1 on input line 47.
 \l__um_primecount_int=\count285
 \g__um_primekern_muskip=\muskip17
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/unicode-math/unicode-math-table.tex))) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/xcolor/xcolor.sty
-Package: xcolor 2022/06/12 v2.14 LaTeX color extensions (UK)
+Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
-Package xcolor Info: Driver file: xetex.def on input line 227.
+Package xcolor Info: Driver file: xetex.def on input line 274.
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics-def/xetex.def
 File: xetex.def 2022/09/22 v5.0n Graphics/color driver for xetex
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/mathcolor.ltx)
-Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1353.
-Package xcolor Info: Model `RGB' extended on input line 1369.
-Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1371.
-Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1372.
-Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1373.
-Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1374.
-Package xcolor Info: Model `Gray' substituted by `gray' on input line 1375.
-Package xcolor Info: Model `wave' substituted by `hsb' on input line 1376.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1350.
+Package xcolor Info: Model `RGB' extended on input line 1366.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1368.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1372.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty
-Package: hyperref 2023-10-27 v7.01d Hypertext links for LaTeX
+Package: hyperref 2023-11-09 v7.01f Hypertext links for LaTeX
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
 Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
@@ -222,7 +222,7 @@ Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/auxhook/auxhook.sty
 Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty
-Package: nameref 2023-10-05 v2.54 Cross-referencing by name of section
+Package: nameref 2023-11-09 v2.55 Cross-referencing by name of section
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/refcount/refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
@@ -239,28 +239,28 @@ Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
 \Hy@linkcounter=\count288
 \Hy@pagecounter=\count289
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def
-File: pd1enc.def 2023-10-27 v7.01d Hyperref: PDFDocEncoding definition (HO)
+File: pd1enc.def 2023-11-09 v7.01f Hyperref: PDFDocEncoding definition (HO)
 ) (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
 \Hy@SavedSpaceFactor=\count290
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def
-File: puenc.def 2023-10-27 v7.01d Hyperref: PDF Unicode definition (HO)
+File: puenc.def 2023-11-09 v7.01f Hyperref: PDF Unicode definition (HO)
 )
-Package hyperref Info: Option `unicode' set `true' on input line 4051.
-Package hyperref Info: Hyper figures OFF on input line 4168.
-Package hyperref Info: Link nesting OFF on input line 4173.
-Package hyperref Info: Hyper index ON on input line 4176.
-Package hyperref Info: Plain pages OFF on input line 4183.
-Package hyperref Info: Backreferencing OFF on input line 4188.
+Package hyperref Info: Option `unicode' set `true' on input line 4054.
+Package hyperref Info: Hyper figures OFF on input line 4171.
+Package hyperref Info: Link nesting OFF on input line 4176.
+Package hyperref Info: Hyper index ON on input line 4179.
+Package hyperref Info: Plain pages OFF on input line 4186.
+Package hyperref Info: Backreferencing OFF on input line 4191.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4435.
+Package hyperref Info: Bookmarks ON on input line 4438.
 \c@Hy@tempcnt=\count291
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
-LaTeX Info: Redefining \url on input line 4773.
+LaTeX Info: Redefining \url on input line 4776.
 \XeTeXLinkMargin=\dimen154
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
@@ -270,13 +270,13 @@ Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 \Fld@menulength=\count292
 \Field@Width=\dimen155
 \Fld@charsize=\dimen156
-Package hyperref Info: Hyper figures OFF on input line 6052.
-Package hyperref Info: Link nesting OFF on input line 6057.
-Package hyperref Info: Hyper index ON on input line 6060.
-Package hyperref Info: backreferencing OFF on input line 6067.
-Package hyperref Info: Link coloring OFF on input line 6072.
-Package hyperref Info: Link coloring with OCG OFF on input line 6077.
-Package hyperref Info: PDF/A mode OFF on input line 6082.
+Package hyperref Info: Hyper figures OFF on input line 6055.
+Package hyperref Info: Link nesting OFF on input line 6060.
+Package hyperref Info: Hyper index ON on input line 6063.
+Package hyperref Info: backreferencing OFF on input line 6070.
+Package hyperref Info: Link coloring OFF on input line 6075.
+Package hyperref Info: Link coloring with OCG OFF on input line 6080.
+Package hyperref Info: PDF/A mode OFF on input line 6085.
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/atbegshi-ltx.sty
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
@@ -287,7 +287,7 @@ package with kernel methods
 )
 Package hyperref Info: Driver (autodetected): hxetex.
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hxetex.def
-File: hxetex.def 2023-10-27 v7.01d Hyperref driver for XeTeX
+File: hxetex.def 2023-11-09 v7.01f Hyperref driver for XeTeX
 (c:/Users/GUSTAVO PC/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/stringenc/stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO)
 )
@@ -854,16 +854,16 @@ Package fancyhdr Warning: \footskip is too small (7.23772pt):
 [3] (./ementa_minicurso_tidyverse.aux)
  ***********
 LaTeX2e <2023-11-01>
-L3 programming layer <2023-11-01>
+L3 programming layer <2023-11-09>
  ***********
 Package rerunfilecheck Info: File `ementa_minicurso_tidyverse.out' has not changed.
-(rerunfilecheck)             Checksum: 8FA6FA9E49F77564BFCCBF071A6FABF4;2206.
+(rerunfilecheck)             Checksum: 324D39C0F0191130675B33CAC6227D10;2211.
  ) 
 Here is how much of TeX's memory you used:
- 16760 strings out of 476927
- 309668 string characters out of 5804382
- 1929164 words of memory out of 5000000
- 38419 multiletter control sequences out of 15000+600000
+ 16752 strings out of 476922
+ 310606 string characters out of 5804310
+ 1929189 words of memory out of 5000000
+ 38416 multiletter control sequences out of 15000+600000
  564570 words of font info for 96 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,11n,122p,547b,490s stack positions out of 10000i,1000n,20000p,200000b,200000s
