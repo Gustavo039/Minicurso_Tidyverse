@@ -1,0 +1,210 @@
+---
+title: "Aula 3 - Modificando Variáveis"
+format:
+  html:
+    theme: united
+    toc: true
+    toc-title: Conteúdo
+    number-sections: true
+    embed-resources: true
+    minimal: true
+
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(fpp3)
+```
+
+## 
+
+Na aula de hoje uma das funções mais importantes durante o processo de processamento de dados, o **mutate**
+
+Ele tem como objetivo criar novas colunas ou alterar colunas já existentes
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/mutate.png){width=70%}
+
+Possui a seguinte sintaxe
+
+```{r, eval = F}
+# Criando nova variável
+dados |>
+  dplyr::mutate(nova_variável = função(variável_existente))
+                
+# Alterando variável já existente
+
+dados |>
+  dplyr::mutate(variável_existente = função(variável_existente))
+```
+
+# Exemplos
+
+## Ações - GAFA
+
+```{r}
+tsibbledata::gafa_stock |>
+  dplyr::filter(Symbol == 'AAPL') |>
+  autoplot(Volume)
+```
+
+
+```{r}
+tsibbledata::gafa_stock |>
+  janitor::clean_names() |>
+  dplyr::filter(symbol == 'AAPL') |>
+  dplyr::mutate(log_volume = 1/(volume)) |>
+  autoplot(log_volume)
+```
+
+
+* 
+```{r}
+tsibbledata::gafa_stock |>
+  as_tibble() |>
+  janitor::clean_names() |>
+  dplyr::mutate(date = tsibble::yearweek(date))
+
+## Pronto para um group_by
+```
+
+
+```{r}
+tsibbledata::gafa_stock |>
+  as_tibble() |>
+  janitor::clean_names() |>
+    dplyr::mutate(ano = lubridate::epiyear(date),
+                  mes = lubridate::month(date)) |>
+  dplyr::filter(ano == 2014,
+                symbol == 'AAPL')
+```
+
+
+# Funções Auxiliares
+
+## dplyr::case_when()
+
+A função case_when funciona como um if-else, porém sendo uma função vetorizada
+
+Ela é chamada da seguinte forma
+
+```{r, eval = F}
+dados |>
+  dplyr::mutate(
+    nova_variável = 
+      dplyr::case_when(
+        valor_variavel % condição_1 ~  valor_a_receber_1,
+        valor_variavel % condição_2 ~ valor_a_receber_1,
+        ...,
+        valor_variavel % condição_n ~ valor_a_receber_n
+        )
+    )
+```
+
+
+```{r}
+tsibbledata::gafa_stock |>
+  tibble::as_tibble() |>
+  janitor::clean_names() |>
+  dplyr::filter(symbol == 'GOOG') |>
+  dplyr::mutate(vol_pad = volume |> scale()) |>
+  dplyr::mutate(
+    cat_vol = 
+      case_when(vol_pad <= -1 ~ 'baixo',
+                vol_pad > -1 & vol_pad <=1 ~ 'medio',
+                vol_pad > 1 ~ 'alto'
+                )
+    )
+  
+```
+
+## dplyr::across()
+
+Aplicar uma função em 2 ou mais colunas em uma 'tacada só'
+
+Ela é chamada da seguinte forma
+
+```{r, eval = F}
+dados |>
+  dplyr::mutate(
+    dplyr::across(
+      c(var1, var2), 
+      ~função(.)
+      )
+    )
+
+dados |>
+  dplyr::mutate(
+    dplyr::across(
+      condição, 
+      ~função(.)
+      )
+    )
+```
+
+
+
+
+
+# SRAG - Datasus
+
+Código Município, Código UF, Idade, comorbidade, teve SRAGS, óbito
+
+```{r}
+df_srag = readr::read_csv2(here::here('./conjunto_de_dados/srag_2023.csv')) 
+
+df_srag = df_srag |>
+  select(CO_MUN_NOT, SG_UF, DT_NOTIFIC, CS_SEXO, NU_IDADE_N, FATOR_RISC, CLASSI_FIN, EVOLUCAO) |>
+  rename(cod_mun = CO_MUN_NOT,
+         uf = SG_UF, 
+         data = DT_NOTIFIC, 
+         sexo = CS_SEXO, 
+         idade = NU_IDADE_N,
+         comorbidade = FATOR_RISC,
+         srag = CLASSI_FIN,
+         obito = EVOLUCAO)
+```
+
+
+```{r}
+df_srag = df_srag |>
+  mutate(
+    data = 
+      stringr::str_replace_all(data, '/', '-') |>
+      lubridate::dmy(),
+    cod_uf = cod_mun |>
+      as.character() |>
+      stringr::str_sub(1, 2) |>
+      as.numeric()
+    ) |>
+  relocate(cod_uf, .before = uf) |>
+  select(-uf) 
+
+
+df_srag |>
+  mutate(
+    comorbidade = 
+      case_when(comorbidade == 1 ~ 1,
+                comorbidade == 2 ~ 0 )) |>
+  mutate(influenza = NA,
+         covid = NA,
+         outros = NA) |>
+  mutate(
+    influenza = 
+      case_when(srag == 1 ~ 1,
+                .default = 0),
+    covid = 
+      case_when(srag == 5 ~ 1,
+                .default = 0),
+    outros = 
+      case_when(srag == 2 | srag == 3 | srag == 4  ~ 1,
+                .default = 0))
+
+
+# 
+#   pivot_longer(cols = c(influenza, covid, outros),
+#                names_to = 'tipo_srag',
+#                values_to = 'freq')
+```
+

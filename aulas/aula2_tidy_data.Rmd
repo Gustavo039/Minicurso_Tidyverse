@@ -1,0 +1,436 @@
+---
+title: "Aula 2 - Dados Tidy"
+format:
+  html:
+    theme: united
+    toc: true
+    toc-title: Conteúdo
+    number-sections: true
+    embed-resources: true
+    minimal: true
+
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+# Botando a mão na massa
+
+Seja bem-vindo a segunda aula do nosso minicurso de Fundamentos de Processamento de Dados Utilizando o Tidyverse! 
+
+Parabéns pela perseverança e vontade de aprender!!
+
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/r_lovers.png){width=70%}
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
+Na aula de hoje, iremos:
+
+* Entender as principais diferenças entre os objetos tabulares do R
+
+* Introduzir o conceito de Tidy Data e observar os principais erros ao se trabalhar com conjunto de dados
+
+* Começar a botar a mão na massa
+
+# Objetos Tabulares
+
+## Data.frame
+
+Sâo objetos para manipulação de dados padrão do R, ou seja, esses já vem instalados com o software
+
+Um data.frame é retangular como uma matriz, mas tem a vantagem de armazenar vetores de diferentes tipos (character, numeric, logical e etc) nas suas colunas. O que não é possível em uma matriz. Ou seja é uma estrutura de armazenamento de dados heterogênea.
+
+Cada linha de um data.frame corresponde a uma observação. Cada coluna corresponde a uma variável.
+
+## Tibble
+
+Se auto denomina como a versão aperfeiçoada de uma data.frame, e é o objeto tabular padrão do Tidyverse
+
+Sua sintaxe se assemelha com funções do SQL e Spark
+
+A introdução do Tibble veio conjuntamente com o conceito de dados Tidy(Tidy Data) desenvolvido por Hadley Wickham, em 2014 no artigo publicado em *Journal of Statistical Software*: [Tidy Data](http://vita.had.co.nz/papers/tidy-data.pdf) 
+
+Esse objeto será profundamente estudado durante esse mini curso
+
+## Data.table
+
+Assim como um data.frame e um tibble, um data.table também é um objeto tabular, onde observações devem ser dispostas nas linhas e variáveis em colunas
+
+O data.table surgiu no contexto de Big Data, sendo um objeto otimizado para processamento de dados em bases de alta dimensionalidade. Sua principal característica é a velocidade de execução
+
+Apesar de ser consumir menos memória e ser extremamente veloz, seus comandos não são compatíveis em outros frameworks, onde um tibble se destaca por essa característica
+
+# Tidy Data
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/tidy_data.jpg){width=70%}
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
+O conceito introduzido por Hadley Wickham em 2014 teve como objetivo de melhorar o processo de limpeza e preparação de dados
+
+Durante o artigo, Wickham listou os 5 erros mais comuns na hora de organizar os dados de acordo com estes princípios.
+
+* Nome de Colunas e Variáveis
+  + Os cabeçalhos (a primeira linha da tabela) são valores, não o nome das variáveis.
+  
+* Duplo Sentido
+  + Uma única variável armazenada em diversas colunas
+  
+* Dados sem orientação
+  + Variáveis armazenadas tanto em linhas, como em colunas.
+  
+* Observações Duplicatas
+  + Diferentes tipos de unidades observacionais estão armazenadas na mesma tabela
+  
+* Observações Dispersas
+  + Uma única unidade observacional está armazenada em diferentes tabelas.
+
+
+# Iniciando o processamento de dados
+
+
+## Etapa 0 - Se localizar
+
+O pacote **here** surgiu para solucionar problemas a relacionados a localização de diretórios de trabalhos. Em contrates a função **setwd()** que é frágil, e causa inúmeros problemas ao se trabalhar em projetos de equipe, o pacote utiliza o conceito de [Project-oriented workflow](https://www.tidyverse.org/blog/2017/12/workflow-vs-script/)
+
+
+
+A documentação oficial do pacote [Here Website](https://here.r-lib.org/articles/here.html)
+
+Ele possui 2 funções principais
+
+* here::here()
+  + Retorna seu diretório atual de trabalho e permite incluir argumentos de caminho posteriores ao seu diretório atual na própria função
+  
+* here::i_am()
+  + Funciona como a função **setwd()**, é utilizada em conjunto com a função here()
+  
+```{r, eval = F}
+# Dados no diretorio de trabalho atual
+here::here('dados.txt')
+
+# Dados em alguma subpasta do diretorio atual
+here::here('./pasta_dados/dados.txt')
+
+# Dados em alguma pasta anterior ao diretorio atual
+
+here::here('../pasta_dados/dados.txt')
+```
+
+
+## Etapa 1 - Carregamento
+
+Para o carregamento dos dados iremos utilizar os pacotes: **readr e readxl**
+
+* readr
+  + [Readr Website](https://readr.tidyverse.org/)
+  + Utilizado para arquivos em: csv, tsv, txt e web log
+  
+* readxl
+  + [Readxl Website](https://readxl.tidyverse.org/)
+  + Utilizado para arquivos em: xlsx e  xls 
+
+
+
+
+## Etapa 2 - Limpeza Inicial
+
+### Janitor
+
+[Janitor Vignette](https://cran.r-project.org/web/packages/janitor/vignettes/janitor.html)
+
+* janitor::clean_names()
+  + Reescreve nomes de colunas de maneira automática
+  + Utilizado sempre após o carregamento inicial dos dados
+  
+* janitor::remove_empty()
+  + Remove linhas ou colunas com valores NAs
+
+* janitor::row_to_names()
+  + Seleciona determinada linha para torna-la como nome de colunas 
+
+### Dplyr
+
+[Dplyr Website](https://dplyr.tidyverse.org/)
+
+* dplyr::filter()
+  + Filtra linhas baseadas em alguma condiÇão
+
+* dplyr::rename()
+  + Renomeia colunas
+  
+* dplyr::select()
+  + Seleciona apenas as colunas desejadas
+  
+## Funções Auxiliares
+
+Utilizadas ao desejar filtrar, renomear ou selecionar várias linhas ou colunas em 'uma tacada'
+
+
+* Selecionar variáveis baseado em alguma condição
+  + As funções **dplyr::starts_with()**, **dplyr::ends_with()** e **dplyr::contains()** selecionam variáveis do tipo caracter baseados em alguma condição (É interessante conhecer as **regular expressions (regex) para utilizar essas funções**)
+  
+```{r}
+
+dplyr::starwars |>
+  dplyr::select(name,
+                hair_color,
+                skin_color,
+                eye_color)
+
+
+## Com função auxiliar
+
+dplyr::starwars |>
+  dplyr::select(c(name, 
+                  dplyr::contains('color')
+                  )
+                )
+
+```
+  
+
+
+
+* Filtragem não especificada
+  + As funções **dplyr::if_any**  **dplyr::if_all** são utilizadas para uma condição em uma filtragem que não especifica uma variável 
+  
+Exemplo Retirado do site do [tidyverse](https://www.tidyverse.org/blog/2021/02/dplyr-1-0-4-if-any/)
+  
+```{r}
+library(palmerpenguins)
+
+# Funcao retorne T ou F se o valor for maoior que o valor médio da variável
+big <- function(x) {
+  x > mean(x, na.rm = TRUE)
+}
+
+
+penguins
+```
+
+
+  
+  
+```{r}
+# keep rows if all the selected columns are "big"
+penguins |>
+  dplyr::filter(dplyr::if_all(contains("bill"), big))
+
+
+```
+
+  
+
+```{r}
+# keep rows where at least one of the columns is "big"
+penguins |>
+  dplyr::filter(dplyr::if_any(contains("bill"), big))
+```
+  
+  
+
+  
+## Exemplos
+
+### Grandes Fortunas - Forbes
+
+O seguinte conjunto de dados foi retirado do [Kaggle](https://www.kaggle.com/datasets/joyshil0599/exploring-wealth-forbes-richest-people-dataset) lista os indivíduos mais ricos do mundo, assim como algumas de suas características
+
+```{r}
+df_forbes = readr::read_csv(here::here('./conjunto_de_dados/forbes.csv'))
+
+```
+
+
+```{r}
+df_forbes |>
+  dplyr::select(-'...1', -'...2') |>
+  janitor::clean_names() |>
+  janitor::remove_empty(which = 'cols')
+
+
+df_forbes |>
+  dplyr::select(-dplyr::starts_with('...'))
+
+```
+
+
+
+* 0 
+  + Remova colunas e linhas indesejáveis. Padronize o nome das variáveis
+
+```{r}
+df_forbes |>
+  dplyr::select(-'...1',
+                -'...2') |>
+  janitor::clean_names() |>
+  janitor::remove_empty(which =  'cols') |>
+  rmarkdown::paged_table()
+```
+
+```{r}
+df_forbes |>
+  dplyr::select(- dplyr::starts_with('...')) |>
+  janitor::clean_names() |>
+  janitor::remove_empty(which =  'cols') |>
+  rmarkdown::paged_table()
+```
+
+```{r}
+# Salvando 
+df_forbes = df_forbes |>
+  dplyr::select(- dplyr::starts_with('...'))  |>
+  janitor::clean_names() |>
+  janitor::remove_empty(which =  'cols') 
+```
+
+
+* 1
+  + Faça uma consulta que retorne apenas indivíduos dos Estados Unidos
+
+```{r}
+df_forbes |>
+  dplyr::filter(country == 'United States') 
+```
+
+
+* 2
+  + Faça uma consulta que retorne apenas indivíduos dos Estados Unidos e com idade abaixo de 30 anos
+  
+```{r}
+df_forbes |>
+  dplyr::filter(country == 'United States' & age < 30) 
+```
+  
+
+
+
+# Desafio do Minicurso
+
+Os seguintes desafios serão utilizados durante todo o mini curso.
+
+
+## Dados Tabnet/Datasus - Morbidade Hospitalar
+
+Os dados foram retirados do [Tabnet](http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sih/cnv/niuf.def). 
+
+O conjunto de dados possui a ufs de referéncia, assim como o total de
+
+```{r}
+
+df_morbidade = readr::read_csv(here::here('./conjunto_de_dados/datasus.csv'),
+                        n_max = 35,
+                        locale = readr::locale(encoding = "latin1"))
+
+df_morbidade
+
+df_morbidade |>
+  janitor::remove_empty(which = 'rows') |>
+  janitor::row_to_names(2) |>
+  dplyr::rename(ufs = 'Região/Unidade da Federação') |>
+  dplyr::filter(!stringr::str_detect(ufs, 'Região')) |>
+  tidyr::pivot_longer(-c(ufs, Total)) |>
+  dplyr::filter(!stringr::str_detect(value, '-'))
+
+ # |>
+ #  dplyr::select(-Total) |>
+ #  dplyr::rename(regiao = name,
+ #                casos = value) |>
+ #  dplyr::mutate(ufs = ufs |>
+ #                  stringr::str_remove_all('.. ') |>
+ #                  tolower(),
+ #                regiao = regiao |>
+ #                  stringr::str_remove_all('\\d\\sRegião\\s') |>
+ #                  tolower())
+```
+
+
+
+
+
+## Dados IBGE - Nascidos Vivos
+
+O seguinte conjunto de dados foi retirado do site do [IBGE](https://www.ibge.gov.br/estatisticas/sociais/populacao/26176-estimativa-do-sub-registro.html)
+
+A tabela possui números de nascidos vivos por uf e por idade da mãe, além de números de subresgistros e subnotificações 
+
+Nosso objetivo é limpar o conjunto de dados, corrigindo nome de variáveis, seu tipo e corrigindo eventuais obstáculos das etapas de análise e modelagem
+
+```{r}
+df_nasc_vivos = readxl::read_xlsx(here::here('./conjunto_de_dados/ibge.xlsx')) |>
+  janitor::row_to_names(1) |>
+  janitor::clean_names() |>
+  dplyr::rename(cod_ibge = codigo_unidade_da_federacao_de_residencia_da_mae,
+                uf = unidade_da_federacao_de_residencia_da_mae,
+                idade = idade_da_mae_na_ocasiao_do_parto,
+                nasc_vivo = total_estimado_de_nascidos_vivos,
+                subres_nasc_vivo = sub_registro_de_nascidos_vivos_ibge_percent,
+                subnot_nasc_vivos = subnotificacao_de_nascidos_vivos_ministerio_da_saude_percent)
+```
+
+## Dados - PRF Sudeste
+
+O seguinte conjunto de dados foi baixado no site do [Detran](https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf), se tratando de acidentes de transito de 2023
+
+O conjunto de dados possui observações do Brasil inteiro, nosso objetivo é limpar esse conjunto, filtrando apenas pelas observações da região Sudeste
+
+```{r}
+library(rvest)
+
+df_prf = readr::read_csv2(here::here('./conjunto_de_dados/datatran2023.csv'), 
+                          locale = readr::locale(encoding = "latin1"))
+
+
+url = rvest::read_html('https://www.ibge.gov.br/explica/codigos-dos-municipios.php')
+
+web_scrap_ufs = data.frame(
+  ufs = url|>
+      rvest::html_nodes('.uf td:nth-child(1) a')|>
+      rvest::html_text(),
+  cod = url|>
+      rvest::html_nodes('.numero a')|>
+      rvest::html_text()
+)
+  
+```
+
+
+Para filtrar baseado na tabela **web_scraps_ufs** devemos antes limpa-la, para isso, sera necessária a função mutate, que veremos na próxima aula
+
+
+
+# Referências
+
+* CANNEL, Brad; LIVINGSTON, Melvin. R for Epidemiology [recurso eletrônico]. 1. ed. Disponível em: [https://www.r4epi.com/](https://www.r4epi.com/).
+
+* ENGEL, Cody. Data Wrangling with R [recurso eletrônico]. 1. ed. Disponível em: [https://cengel.github.io/R-data-wrangling/](https://cengel.github.io/R-data-wrangling/)
+
+* WICKHAM, Hadley; GROLEMUND, Garrett. R for Data Science [recurso eletrônico]. Disponível em: [https://r4ds.had.co.nz/index.html](https://r4ds.had.co.nz/index.html).
+
+
+----------------------------
+
+
+<style>
+/* Custom CSS for footer */
+footer {
+    text-align: center;
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+footer img {
+    max-width: 150px; /* Adjust width as needed */
+    height: auto;
+}
+</style>
+
+
+
+<footer>
+    <img src="D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/footer.png" alt="Footer Image">
+</footer>
