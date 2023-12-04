@@ -318,7 +318,7 @@ Os seguintes desafios serão utilizados durante todo o mini curso.
 
 Os dados foram retirados do [Tabnet](http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sih/cnv/niuf.def). 
 
-O conjunto de dados possui a ufs de referéncia, assim como o total de
+O conjunto de dados possui a ufs de referéncia, assim como o total de morbidade hospitalar
 
 ```{r}
 
@@ -328,27 +328,38 @@ df_morbidade = readr::read_csv(here::here('./conjunto_de_dados/datasus.csv'),
 
 df_morbidade
 
-df_morbidade |>
+df_morbidade = df_morbidade |>
   janitor::remove_empty(which = 'rows') |>
   janitor::row_to_names(2) |>
   dplyr::rename(ufs = 'Região/Unidade da Federação') |>
-  dplyr::filter(!stringr::str_detect(ufs, 'Região')) |>
-  tidyr::pivot_longer(-c(ufs, Total)) |>
-  dplyr::filter(!stringr::str_detect(value, '-'))
+  dplyr::filter(!stringr::str_detect(ufs, 'Região'))
 
- # |>
- #  dplyr::select(-Total) |>
- #  dplyr::rename(regiao = name,
- #                casos = value) |>
- #  dplyr::mutate(ufs = ufs |>
- #                  stringr::str_remove_all('.. ') |>
- #                  tolower(),
- #                regiao = regiao |>
- #                  stringr::str_remove_all('\\d\\sRegião\\s') |>
- #                  tolower())
+
 ```
 
 
+```{r}
+df_morbidade |> rmarkdown::paged_table()
+```
+
+Podemos chegar até essa etapa de uma limpeza dos dados com o que foi visto nessa aula
+
+Um spoiler do que veremos na próxima aula, onde conheceremos as funções mutate, pivot_longer e pivot_wider
+
+```{r}
+ df_morbidade |>
+  tidyr::pivot_longer(-c(ufs, Total)) |>
+  dplyr::filter(!stringr::str_detect(value, '-')) |>
+  dplyr::select(-Total) |>
+  dplyr::rename(regiao = name,
+                casos = value) |>
+  dplyr::mutate(ufs = ufs |>
+                  stringr::str_remove_all('.. ') |>
+                  tolower(),
+                regiao = regiao |>
+                  stringr::str_remove_all('\\d\\sRegião\\s') |>
+                  tolower())
+```
 
 
 

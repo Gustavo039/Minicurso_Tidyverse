@@ -219,7 +219,7 @@ dplyr::storms |>
 
 Suponha a seguinte tarefa
 
-Retorne apenas as observações entre os anos de 1976 e 1977, na cidade de Clara, organizando a tabela pela variável 'pressão da tempestade' em ordem descresente, removenda as colunas NAs
+Retorne apenas as observações entre os anos de 1976 e 1977, com o nome de Clara, organizando a tabela pela variável 'pressão da tempestade' em ordem descresente, removenda as colunas NAs
 
 (As funções utilizadas serão introduzidas em aulas futuras)
 
@@ -256,7 +256,7 @@ Funções anônimas (também chamadas de *funções lambda*) em R não são fun�
 * Funções em R, podem ser declaradas como
 
 ```{r, eval=F}
-nome_funcao = function(argumeto_1, argumento_2, ..., argumento_n){
+nome_funcao = function(argumento_1, argumento_2, ..., argumento_n){
   #Conteudo da Função
 }
 ```

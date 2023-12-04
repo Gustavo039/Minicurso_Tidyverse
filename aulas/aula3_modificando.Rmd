@@ -1,5 +1,5 @@
 ---
-title: "Aula 3 - Modificando Variáveis"
+title: "Aula 3 - Modificando Variáveis e Mudando a Forma dos Dados"
 format:
   html:
     theme: united
@@ -13,18 +13,39 @@ format:
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 library(tidyverse)
 library(fpp3)
 ```
 
-## 
+# Dando um Novo Sentido e Forma aos Dados
 
-Na aula de hoje uma das funções mais importantes durante o processo de processamento de dados, o **mutate**
+Seja bem-vindo a terceira aula do nosso minicurso de Fundamentos de Processamento de Dados Utilizando o Tidyverse! 
+
+Parabéns pela perseverança e vontade de aprender, e lembre-se, você já sabe mais do que na primeira aula !!
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/you_know.png){width=70%}
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
+Na aula de hoje, iremos:
+
+* Conhecer a função **mutate** para modificação de variáveis
+
+* Exemplificar como a função **across** auxilia o uso do mutate
+
+* Introduzir as funções de reestruturação de dados **pivot_longer** e **pivot_wider**
+
+# Modificando Variáveis
+
+Na aula de hoje iremos ver uma das funções mais importantes durante o processo de manipulação de dados, o **mutate**
 
 Ele tem como objetivo criar novas colunas ou alterar colunas já existentes
 
 ![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/mutate.png){width=70%}
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
 
 Possui a seguinte sintaxe
 
@@ -39,9 +60,19 @@ dados |>
   dplyr::mutate(variável_existente = função(variável_existente))
 ```
 
-# Exemplos
+## Exemplos
 
-## Ações - GAFA
+### Ações - GAFA
+
+O seguinte conjunto de dados possui informações sobre ações das empresas: Google, Apple, Facebook e Amazon
+
+```{r}
+tsibbledata::gafa_stock  |>
+  rmarkdown::paged_table()
+```
+
+
+O volume de ações da Apple apresentou o seguinte comportamento
 
 ```{r}
 tsibbledata::gafa_stock |>
@@ -50,16 +81,19 @@ tsibbledata::gafa_stock |>
 ```
 
 
+* Se desejássemos transformar a variável *volume*, podemos usar a função mutate
+
 ```{r}
 tsibbledata::gafa_stock |>
   janitor::clean_names() |>
   dplyr::filter(symbol == 'AAPL') |>
-  dplyr::mutate(log_volume = 1/(volume)) |>
-  autoplot(log_volume)
+  dplyr::mutate(volume_trans = 1/(volume)) |>
+  autoplot(volume_trans)
 ```
 
 
-* 
+* Se desejássemos modificar a data para o tipo ano - mês
+
 ```{r}
 tsibbledata::gafa_stock |>
   as_tibble() |>
@@ -70,20 +104,33 @@ tsibbledata::gafa_stock |>
 ```
 
 
+* Se desejássemos extrair o ano e mês para novas variáveis distintas
+
 ```{r}
 tsibbledata::gafa_stock |>
   as_tibble() |>
   janitor::clean_names() |>
-    dplyr::mutate(ano = lubridate::epiyear(date),
+    dplyr::mutate(ano = lubridate::year(date),
                   mes = lubridate::month(date)) |>
   dplyr::filter(ano == 2014,
                 symbol == 'AAPL')
 ```
 
 
-# Funções Auxiliares
+* Calculando a variação entre o preço na abertura x encerramento do dia
 
-## dplyr::case_when()
+```{r}
+tsibbledata::gafa_stock |>
+  janitor::clean_names() |>
+  tibble::as_tibble() |>
+  dplyr::mutate(variacao_dia = open - close, 
+                .keep = 'unused') 
+```
+
+
+## Funções Auxiliares
+
+### dplyr::case_when()
 
 A função case_when funciona como um if-else, porém sendo uma função vetorizada
 
@@ -94,14 +141,19 @@ dados |>
   dplyr::mutate(
     nova_variável = 
       dplyr::case_when(
-        valor_variavel % condição_1 ~  valor_a_receber_1,
-        valor_variavel % condição_2 ~ valor_a_receber_1,
+        valor_variavel % condição_1 ~ valor_a_receber_1,
+        valor_variavel % condição_2 ~ valor_a_receber_2,
         ...,
         valor_variavel % condição_n ~ valor_a_receber_n
         )
     )
 ```
 
+
+
+Voltando ao exemplo das ações
+
+* Classificando o volume de ações em: baixo, médio e alto 
 
 ```{r}
 tsibbledata::gafa_stock |>
@@ -119,7 +171,7 @@ tsibbledata::gafa_stock |>
   
 ```
 
-## dplyr::across()
+### dplyr::across()
 
 Aplicar uma função em 2 ou mais colunas em uma 'tacada só'
 
@@ -134,6 +186,8 @@ dados |>
       )
     )
 
+## OU
+
 dados |>
   dplyr::mutate(
     dplyr::across(
@@ -144,17 +198,121 @@ dados |>
 ```
 
 
+```{r}
+tsibbledata::gafa_stock |>
+  tibble::as_tibble() |>
+  janitor::clean_names() |>
+  dplyr::mutate(
+    dplyr::across(c(open:close), 
+                  ~scale(.)
+                  )
+    )
+```
 
+
+```{r}
+tsibbledata::gafa_stock |>
+  tibble::as_tibble() |>
+  janitor::clean_names() |>
+  dplyr::mutate(
+    dplyr::across(is.numeric,
+      ~scale(.)
+      )
+    )
+
+```
+
+
+
+```{r}
+tsibbledata::gafa_stock |>
+  tibble::as_tibble()  |>
+  janitor::clean_names() |>
+  dplyr::filter(
+    symbol == 'AAPL'
+    ) |>
+  rowwise() |>
+  dplyr::mutate(
+    media_dia = 
+      mean(c(open:close))
+    ) |>
+  dplyr::select(date, volume, media_dia) |>
+  tidyr::pivot_longer(-date) |>
+  ggplot(aes(x = date, y = value)) +
+  geom_line() +
+  facet_grid('name', scales = 'free')
+```
+
+
+# Pivotando
+
+As funções **tidyr::pivot_wider** e **tidyr::pivot_longer** tem o objetivo mudar a forma que os dados estão dispostos em um tibble
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/pivot.png){width=60%}
+
+Possuem a seguinte estrutura
+
+* pivot_longer
+
+```{r, eval = F}
+dados |>
+  tidyr::pivot_longer(variáveis, 
+                      names_to = 'variável_nomes', 
+                      values_to = 'variável valores')
+```
+
+
+
+* pivot_wider
+
+```{r, eval = F}
+dados |>
+  tidyr::pivot_wider(variáveis, 
+                      names_from = 'variável_nomes', 
+                      values_from = 'variável valores')
+```
+
+Uma função reverte a outra
+
+## Exemplos
+
+### Renda por religião
+
+```{r}
+tidyr::relig_income |>
+  rmarkdown::paged_table()
+```
+
+
+
+```{r}
+tidyr::relig_income |>
+  tidyr::pivot_longer(-religion,
+                      names_to = 'renda',
+                      values_to = 'freq')
+```
+
+
+Voltando a forma original
+
+```{r}
+tidyr::relig_income |>
+  tidyr::pivot_longer(-religion,
+                      names_to = 'renda',
+                      values_to = 'freq') |>
+  tidyr::pivot_wider(names_from = 'renda',
+                     values_from = 'freq')
+```
 
 
 # SRAG - Datasus
 
 Código Município, Código UF, Idade, comorbidade, teve SRAGS, óbito
 
-```{r}
-df_srag = readr::read_csv2(here::here('./conjunto_de_dados/srag_2023.csv')) 
+```{r, message= F}
+df_srag_pessoa = readr::read_csv2(here::here('./conjunto_de_dados/srag_2023.csv')) 
 
-df_srag = df_srag |>
+df_srag_pessoa = df_srag_pessoa |>
   select(CO_MUN_NOT, SG_UF, DT_NOTIFIC, CS_SEXO, NU_IDADE_N, FATOR_RISC, CLASSI_FIN, EVOLUCAO) |>
   rename(cod_mun = CO_MUN_NOT,
          uf = SG_UF, 
@@ -168,7 +326,7 @@ df_srag = df_srag |>
 
 
 ```{r}
-df_srag = df_srag |>
+df_srag_pessoa = df_srag_pessoa |>
   mutate(
     data = 
       stringr::str_replace_all(data, '/', '-') |>
@@ -182,11 +340,13 @@ df_srag = df_srag |>
   select(-uf) 
 
 
-df_srag |>
+df_srag_pessoa = df_srag_pessoa |>
   mutate(
     comorbidade = 
       case_when(comorbidade == 1 ~ 1,
-                comorbidade == 2 ~ 0 )) |>
+                comorbidade == 2 ~ 0,
+                comorbidade == 9 ~ 0)
+    ) |>
   mutate(influenza = NA,
          covid = NA,
          outros = NA) |>
@@ -199,12 +359,202 @@ df_srag |>
                 .default = 0),
     outros = 
       case_when(srag == 2 | srag == 3 | srag == 4  ~ 1,
-                .default = 0))
+                .default = 0)
+    ) |>
+  mutate(
+    obito = 
+      case_when(obito == 1 | obito == 9 ~ 0,
+                obito == 2 | obito == 3 ~ 1) 
+    ) |>
+  mutate(
+    srag = 
+      case_when(srag == NA ~ 0,
+                .default = 1)
+    ) |>
+  tidyr::pivot_longer(c(influenza, covid, outros),
+                      names_to = 'tipo_srag',
+                      values_to = 'tipo_freq')
 
-
-# 
-#   pivot_longer(cols = c(influenza, covid, outros),
-#                names_to = 'tipo_srag',
-#                values_to = 'freq')
 ```
+
+
+# Desafio do Minicurso
+
+## Dados Tabnet/Datasus - Morbidade Hospitalar
+
+Os dados foram retirados do [Tabnet](http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sih/cnv/niuf.def). 
+
+O conjunto de dados possui a ufs de referéncia, assim como o total de
+
+```{r}
+
+df_morbidade = readr::read_csv(here::here('./conjunto_de_dados/datasus.csv'),
+                        n_max = 35,
+                        locale = readr::locale(encoding = "latin1"))
+
+df_morbidade
+
+df_morbidade |>
+  janitor::remove_empty(which = 'rows') |>
+  janitor::row_to_names(2) |>
+  dplyr::rename(ufs = 'Região/Unidade da Federação') |>
+  dplyr::filter(!stringr::str_detect(ufs, 'Região')) |>
+  tidyr::pivot_longer(-c(ufs, Total)) |>
+  dplyr::filter(!stringr::str_detect(value, '-')) |>
+  dplyr::select(-Total) |>
+  dplyr::rename(regiao = name,
+                casos = value) |>
+  dplyr::mutate(ufs = ufs |>
+                  stringr::str_replace_all("\\.{2} ", "") |>
+                  tolower() |>
+                  abjutils::rm_accent(),
+                regiao = regiao |>
+                  stringr::str_remove_all('\\d\\sRegião\\s') |>
+                  tolower())
+```
+
+
+
+## Dados IBGE - Nascidos Vivos
+
+O seguinte conjunto de dados foi retirado do site do [IBGE](https://www.ibge.gov.br/estatisticas/sociais/populacao/26176-estimativa-do-sub-registro.html)
+
+A tabela possui números de nascidos vivos por uf e por idade da mãe, além de números de subresgistros e subnotificações 
+
+Nosso objetivo é limpar o conjunto de dados, corrigindo nome de variáveis, seu tipo e corrigindo eventuais obstáculos das etapas de análise e modelagem
+
+```{r}
+df_nasc_vivos = readxl::read_xlsx(here::here('./conjunto_de_dados/ibge.xlsx')) |>
+  janitor::row_to_names(1) |>
+  janitor::clean_names() |>
+  dplyr::rename(cod_ibge = codigo_unidade_da_federacao_de_residencia_da_mae,
+                uf = unidade_da_federacao_de_residencia_da_mae,
+                idade = idade_da_mae_na_ocasiao_do_parto,
+                nasc_vivo = total_estimado_de_nascidos_vivos,
+                subres_nasc_vivo = sub_registro_de_nascidos_vivos_ibge_percent,
+                subnot_nasc_vivos = subnotificacao_de_nascidos_vivos_ministerio_da_saude_percent)
+```
+
+```{r}
+df_nasc_vivos |>
+  dplyr::filter(!cod_ibge == 99, 
+                !is.na(uf)) |>
+  dplyr::mutate(
+    dplyr::across(
+      c(nasc_vivo:subnot_nasc_vivos), 
+      ~as.numeric(.)
+      )
+    ) |>
+  dplyr::mutate(uf = uf |>
+                  tolower() |>
+                  abjutils::rm_accent())
+  
+```
+
+
+## Dados - PRF Sudeste
+
+O seguinte conjunto de dados foi baixado no site do [Detran](https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf), se tratando de acidentes de transito de 2023
+
+O conjunto de dados possui observações do Brasil inteiro, nosso objetivo é limpar esse conjunto, filtrando apenas pelas observações da região Sudeste
+
+```{r}
+library(rvest)
+
+df_prf = readr::read_csv2(here::here('./conjunto_de_dados/datatran2023.csv'), 
+                          locale = readr::locale(encoding = "latin1"))
+
+
+df_prf |>
+  head() |>
+  rmarkdown::paged_table()
+```
+
+* Construindo a tabela de estados
+
+```{r}
+url = rvest::read_html('https://www.ibge.gov.br/explica/codigos-dos-municipios.php')
+
+web_scrap_ufs = data.frame(
+  ufs = url|>
+      rvest::html_nodes('.uf td:nth-child(1) a')|>
+      rvest::html_text(),
+  cod_uf = url|>
+      rvest::html_nodes('.numero a')|>
+      rvest::html_text()
+) |>
+  dplyr::mutate(
+    cod_uf = cod_uf |> 
+      stringr::str_remove('ver municípios') |>
+      as.numeric(),
+    ufs = ufs |> 
+      tolower() |>
+      abjutils::rm_accent()
+    
+    )
+
+web_scrap_ufs |> head()
+  
+```
+
+Construindo a tabela de municípios
+
+```{r}
+web_scrap_mun = 
+  data.frame(
+    mun = url|>
+      rvest::html_nodes('.municipio a')|>
+      rvest::html_text() |>
+      tolower() |>
+      abjutils::rm_accent(),
+    cod_mun = url |>
+      rvest::html_nodes('.municipio .numero')|>
+      rvest::html_text()
+    ) |>
+  dplyr::mutate(cod_uf = cod_mun |>
+                  as.character() |>
+                  stringr::str_sub(1, 2)) 
+
+web_scrap_mun |> head()
+```
+
+
+
+Com as tabelas já construídas, podemos juntá-las, para isso, iremos utilizar função **inner_join**.
+
+Veremos esses conceitos na próxima aula
+
+# Referências
+
+* Curso-R. Ciência de Dados em R [recurso eletrônico]. São Paulo: Curso-R, 2022. Disponível em: [https://livro.curso-r.com/index.html](https://livro.curso-r.com/index.html).
+
+* ENGEL, Cody. Data Wrangling with R [recurso eletrônico]. 1. ed. Disponível em: [https://cengel.github.io/R-data-wrangling/](https://cengel.github.io/R-data-wrangling/)
+
+* WICKHAM, Hadley; GROLEMUND, Garrett. R for Data Science [recurso eletrônico]. Disponível em: [https://r4ds.had.co.nz/index.html](https://r4ds.had.co.nz/index.html).
+
+* KUHN, Max; SILGE, Julia. Tidy Modeling with R. 1st ed. [recurso eletrônico] Disponível em: [https://www.tmwr.org/](https://www.tmwr.org/).
+
+
+----------------------------
+
+
+<style>
+/* Custom CSS for footer */
+footer {
+    text-align: center;
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+footer img {
+    max-width: 150px; /* Adjust width as needed */
+    height: auto;
+}
+</style>
+
+
+
+<footer>
+    <img src="D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/footer.png" alt="Footer Image">
+</footer>
 
