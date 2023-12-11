@@ -1,0 +1,466 @@
+---
+title: "Aula 4 - Pares de Tabelas e Grupos de Variáveis "
+format:
+  html:
+    theme: united
+    toc: true
+    toc-title: Conteúdo
+    number-sections: true
+    embed-resources: true
+    minimal: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+library(tidyverse)
+library(lubridate)
+```
+
+
+Operação em Grupos e Pares de Tabelas
+
+Seja bem-vindo a quarta aula do nosso minicurso de Fundamentos de Processamento de Dados Utilizando o Tidyverse!
+
+Parabéns por chegar até aqui!! 
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/you_can.png){width=70%}
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
+
+Na aula de hoje, iremos:
+
+* Conhecer as funções **dplyr::join**  para junção de pares de tabelas
+
+* Começar a trabalhar com operações via **dplyr::summarise** em observações agrupadas com a função **dplyr::group_by**
+
+
+# Junção de Conjunto de Dados
+
+As funções com sufixo **_join** possuem o objetivo de juntar pares de conjunto de dados baseado em alguma condição e alguma chave
+
+
+Dado dois conjuntos de dados, x e y. Sua sintaxe é dada por:
+
+```{r, eval = F}
+dplyr::prefixo_join(dados_x, dados_y, 
+             by = 'chave')
+```
+
+Temos que os prefixos disponíveis no dplyr são
+
+* inner
+  + Mantém apenas as observações que possuem chave em x equivalente em y
+
+* full
+  + Mantém todas as observações de x e y
+  
+* left e right
+  + Left: Mantém todas as observações de x
+  + Right: Mantém todas as observações de y
+  
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/joins.png){width=70%}
+
+[Imagem reirada do site do Metabase](https://www.metabase.com/learn/sql-questions/sql-join-types)
+
+As funções do pacote possuem argumentos semelhantes com os argumentos do SQL:
+
+* relationship 
+  + 1 para 1; 1 para muitos, muitos para 1; muitos para muitos
+
+* multiple
+  + Observações com múltiplas correspondências
+
+* unmatched
+  + Remover observações sem correspondência ou landar um erro
+
+Os argumentos podem ser vistos via help da função: **?dplyr::inner_join** ou via o website oficial [Joins dplyr](https://dplyr.tidyverse.org/reference/mutate-joins.html)
+
+
+## Exemplo - Futebol Europeu
+
+Os seguintes conjuntos de dados foram construidos a partir do site [Transfermarkt](https://www.transfermarkt.com.br/) via raspagem de dados
+
+* 3 conjuntos de dados foram construídos
+  + Participantes da La Liga na temporada de 22/23
+  + Participantes da Liga dos Campeões na temporada de 22/23
+  + Participantes da Liga Europa na temporada de 22/23
+
+```{r}
+library(rvest)
+
+url_la_liga = rvest::read_html('https://www.transfermarkt.com.br/laliga/tabelle/wettbewerb/ES1?saison_id=2022')
+
+web_scrap_la_liga = data.frame(
+  times = url_la_liga |>
+      rvest::html_nodes('#yw1 .no-border-links')|>
+      rvest::html_text() |>
+      stringr::str_remove_all('fc') |>
+      stringr::str_remove_all('cf') |>
+      stringr::str_trim() |>
+      str_replace_all("\\s+", "_") |>
+      tolower() |>
+      abjutils::rm_accent(),
+  pts = url_la_liga |>
+      rvest::html_nodes('.zentriert:nth-child(10)')|>
+      rvest::html_text()
+)
+
+url_champions_league =  rvest::read_html('https://www.transfermarkt.com.br/uefa-champions-league/teilnehmer/pokalwettbewerb/CL/saison_id/2022')
+
+web_scrap_champions_league = 
+  data.frame(
+    times = url_champions_league |>
+        rvest::html_nodes('.hauptlink')|>
+        rvest::html_text() |>
+        tolower() |>
+        stringr::str_remove_all('fc') |>
+        stringr::str_remove_all('cf') |>
+        stringr::str_trim() |>
+        stringr::str_replace_all(' ', '_') |>
+        abjutils::rm_accent(), 
+    idade_media = url_champions_league |>
+        rvest::html_nodes('.zentriert+ td.zentriert')|>
+        rvest::html_text(),
+    valor_mercado = url_champions_league |>
+        rvest::html_nodes('.zentriert+ td.rechts') |>
+        rvest::html_text()
+  ) |>
+  dplyr::mutate(idade_media = idade_media |>
+                  stringr::str_replace(',','.') |>
+                  as.numeric())
+
+
+url_europa_league =  rvest::read_html('https://www.transfermarkt.com.br/europa-league/teilnehmer/pokalwettbewerb/EL/saison_id/2022')
+
+web_scrap_europa_league = 
+  data.frame(
+    times = url_europa_league |>
+        rvest::html_nodes('.hauptlink')|>
+        rvest::html_text() |>
+        tolower() |>
+        stringr::str_remove_all('fc') |>
+        stringr::str_remove_all('cf') |>
+        stringr::str_trim() |>
+        stringr::str_replace_all(' ', '_') |>
+        abjutils::rm_accent(), 
+    idade_media = url_europa_league |>
+        rvest::html_nodes('.zentriert+ td.zentriert')|>
+        rvest::html_text(),
+    valor_mercado = url_europa_league |>
+        rvest::html_nodes('.zentriert+ td.rechts') |>
+        rvest::html_text()
+  ) |>
+  dplyr::mutate(
+    idade_media = 
+      idade_media |>
+      stringr::str_replace(',','.') |>
+      as.numeric()
+    ) 
+
+
+```
+
+* Dados La Liga
+
+```{r}
+web_scrap_la_liga |>
+  rmarkdown::paged_table()
+```
+
+
+
+* Dados Liga dos Campeões
+
+```{r}
+web_scrap_champions_league |>
+  rmarkdown::paged_table()
+```
+
+* Dados Liga Europa 
+
+```{r}
+web_scrap_europa_league |>
+  rmarkdown::paged_table()
+```
+
+
+Com tabelas já construidas podemos realizar os cruzamentos
+
+* Times de La Liga que estiveram na Liga dos Campeões
+
+```{r}
+dplyr::inner_join(web_scrap_champions_league, web_scrap_la_liga,
+                  by = 'times')
+```
+
+* Times de La Liga que estiveram na Liga Europa
+
+```{r}
+dplyr::inner_join(web_scrap_la_liga, web_scrap_europa_league, 
+                  by = 'times')
+```
+
+* Times que estiveram na Liga dos Campeões e na Liga Europa
+
+```{r}
+dplyr::inner_join(web_scrap_champions_league, web_scrap_europa_league, 
+                  by = 'times')
+```
+
+
+# Agrupamento por Variável
+
+A função **group_by** tem como objetivo agrupamento de observações por alguma variável de correspondência, permitindo transformações de variáveis em observações já agrupadas.
+
+Na etapa de agrupamento, as seguintes funções são as mais utilizadas
+
+* dplyr::group_by()
+  + Dado um tibble, as observações serão agrupadas por uma ou mais variáveis passadas como argumento
+  
+Tem a seguinte sintaxe
+
+```{r, eval = F}
+dados |>
+  dplyr::group_by(variavel_1, variavel_2, ..., variavel_n)
+```
+
+
+* dplyr::summarise
+  + Dado um tibble já agrupado via **dplyr::group_by()**, a função aplica alguma transformação como média, soma e etc em alguma variável de interesse
+
+Tem a seguinte sintaxe
+
+```{r, eval = F}
+dados |>
+  dplyr::group_by(variavel_1, variavel_2, ..., variavel_n) |>
+  dplyr::summarise(nova_variavel = função(variavel_existente))
+```
+
+* dplyr::ungroup
+  + Dado um tibble já agrupado via **dplyr::group_by()**, a função remove os grupos, retornando o o tibble padrão
+
+```{r, eval = F}
+dados |>
+  dplyr::group_by(variavel_1, variavel_2, ..., variavel_n) |>
+  dplyr::ungroup()
+```
+
+
+
+## Exemplo - Atletismo nas Olimpíadas
+
+O seguinte conjunto de dados tras informações sobre os tempos de eventos de atletismo nas olimpíadas
+
+```{r}
+tsibbledata::olympic_running |>
+  tibble::as.tibble() |>
+  janitor::clean_names() |>
+  rmarkdown::paged_table()
+```
+
+
+* Calculando uma média por evento e por sexo
+
+```{r}
+tsibbledata::olympic_running |>
+  tibble::as.tibble() |>
+  janitor::clean_names() |>
+  dplyr::group_by(length, sex) |>
+  dplyr::summarise(media_tempo = mean(time, na.rm = T))
+```
+
+* Calculando o tempo mínimo por evento e por sexo
+
+```{r}
+tsibbledata::olympic_running |>
+  tibble::as.tibble() |>
+  janitor::clean_names() |>
+  dplyr::group_by(length, sex) |>
+  dplyr::summarise(minimo_tempo = min(time, na.rm=T))
+```
+
+* Observando a evolução dos tempos conjuntos: masculinos e femininos por evento e por ano
+
+```{r}
+tempo_cat = tsibbledata::olympic_running |>
+  tibble::as.tibble() |>
+  janitor::clean_names() |>
+  dplyr::group_by(length, year) |>
+  dplyr::summarise(evolucao_tempo = mean(time, na.rm = T)) 
+```
+
+```{r}
+tempo_cat |>
+  ggplot(aes(x = year, y = evolucao_tempo)) +
+  geom_line() +
+  facet_wrap('length', scales = 'free')
+  
+```
+
+
+
+# Desafios
+
+## Dados - PRF Sudeste
+
+O seguinte conjunto de dados foi baixado no site do [Detran](https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf), se tratando de acidentes de transito de 2023
+
+O conjunto de dados possui observações do Brasil inteiro, nosso objetivo é limpar esse conjunto, filtrando apenas pelas observações da região Sudeste
+
+```{r}
+
+df_prf = readr::read_csv2(here::here('./conjunto_de_dados/datatran2023.csv'), 
+                          locale = readr::locale(encoding = "latin1")) |>
+  dplyr::select(-uf) |>
+  dplyr::mutate(municipio = municipio |>
+           tolower() |>
+           stringr::str_replace_all(' ', "_"))
+
+
+df_prf |>
+  head() |>
+  rmarkdown::paged_table()
+```
+
+* Construindo a tabela de estados
+
+```{r}
+library(rvest)
+url = rvest::read_html('https://www.ibge.gov.br/explica/codigos-dos-municipios.php')
+
+web_scrap_ufs = data.frame(
+  uf = url|>
+      rvest::html_nodes('.uf td:nth-child(1) a')|>
+      rvest::html_text() |>
+      stringr::str_replace_all(' ', "_"),
+  cod_uf = url|>
+      rvest::html_nodes('.numero a')|>
+      rvest::html_text()
+) |>
+  dplyr::mutate(
+    cod_uf = cod_uf |> 
+      stringr::str_remove('ver municípios') |>
+      as.numeric(),
+    uf = uf |> 
+      tolower() |>
+      abjutils::rm_accent()
+    
+    )
+
+web_scrap_ufs |> head()
+  
+```
+
+Construindo a tabela de municípios
+
+```{r}
+web_scrap_mun = 
+  data.frame(
+    municipio = url|>
+      rvest::html_nodes('.municipio a')|>
+      rvest::html_text() |>
+      tolower() |> 
+      abjutils::rm_accent() |>
+      stringr::str_replace_all(' ', "_"),
+    cod_mun = url |>
+      rvest::html_nodes('.municipio .numero')|>
+      rvest::html_text() |>
+      as.numeric()
+    ) |>
+  dplyr::mutate(cod_uf = cod_mun |>
+                  as.character() |>
+                  stringr::str_sub(1, 2) |>
+                  as.numeric()) 
+
+web_scrap_mun |> head()
+```
+
+Com as funções que vimos hoje de junção de tabelas, podemos finalmente juntar a tabela de município, com tabela de ufs e a tabela de acidentes
+
+
+* Junção municípios com ufs
+
+```{r}
+df_mun_uf = web_scrap_mun |>
+  left_join(web_scrap_ufs, by = 'cod_uf')
+```
+
+
+
+Junção dados acidente com municípios_ufs
+
+```{r}
+df_prf |>
+  left_join(df_mun_uf, by = 'municipio')
+```
+
+Por organização, não trabalhamos com dados dos nomes das cidades e das ufs na tabela de dados de , utilizamos apenas as chaves: **cod_mun** e **cod_uf**
+
+```{r}
+df_prf_geo = df_prf |>
+  left_join(df_mun_uf, by = 'municipio') |>
+  dplyr::select(-municipio, -uf)
+
+
+df_prf_geo |> 
+  rmarkdown::paged_table()
+```
+
+Assim, agora com a tabela de acidentes ja contendo informações de cidade e ufs, podemos filtrar pela região Sudeste
+
+```{r}
+df_prf_geo |>
+  dplyr::mutate(cod_uf = 
+                  cod_uf |> as.character()) |>
+  dplyr::filter(cod_uf |>
+                  stringr::str_starts('3'))
+```
+
+
+Se por exemplo, quisesemos filtrar pelas observações da baixada santista, que possue as cidades: Santos, Praia Grande, São Vicente, Mongagua e Guarujá
+
+```{r}
+cidades_baixada = c('praia_grande',
+                    'santos', 
+                    'guaruja',
+                    'mongagua')
+
+df_mun_uf |>
+  dplyr::filter(municipio %in% cidades_baixada & uf == 'sao_paulo' ) |>
+  dplyr::left_join(df_prf_geo, by = 'cod_mun')
+```
+
+Não tivemos valores correspondentes na tabela de acidentes, indicando que nenhum acidente nessas cidades foi registrado
+
+
+Filtrando pelas cidades da Zona da Mata
+
+```{r}
+cidades_zona_mata = c('juiz_de_fora',
+                      'santos_dumont', 
+                      'vicosa', 
+                      'rio_pomba',
+                      'lima_duarte')
+
+df_mun_uf |>
+  dplyr::filter(municipio %in% cidades_zona_mata & uf == 'minas_gerais' ) |>
+  dplyr::inner_join(df_prf_geo, by = 'cod_mun') |>
+  rmarkdown::paged_table()
+```
+
+
+Podemos calcular uma média de pessoas mortas por acidente na Região da Zona da Mata divido por cidade
+
+```{r}
+df_mun_uf |>
+  dplyr::filter(municipio %in% cidades_zona_mata & uf == 'minas_gerais' ) |>
+  dplyr::inner_join(df_prf_geo, by = 'cod_mun') |>
+  dplyr::group_by(cod_mun,
+                  municipio
+                  ) |>
+  dplyr::summarise(media_mortos = mean(mortos)) |>
+  rmarkdown::paged_table()
+```
+
+

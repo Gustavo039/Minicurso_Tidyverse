@@ -198,6 +198,8 @@ dados |>
 ```
 
 
+Padronizando um vetor de variáveis
+
 ```{r}
 tsibbledata::gafa_stock |>
   tibble::as_tibble() |>
@@ -209,6 +211,8 @@ tsibbledata::gafa_stock |>
     )
 ```
 
+
+Padronizando todas as variáveis numéricas
 
 ```{r}
 tsibbledata::gafa_stock |>
@@ -223,6 +227,7 @@ tsibbledata::gafa_stock |>
 ```
 
 
+Criando a variável **media_dia** e observando sua relação com o volume de ações
 
 ```{r}
 tsibbledata::gafa_stock |>
@@ -272,7 +277,7 @@ dados |>
                       values_from = 'variável valores')
 ```
 
-Uma função reverte a outra
+Trabalhando da forma longa, seu conjunto de dados possue mais observações e e menos variáveis, enquanto que na forma ampla, ele possu mais variáveis e menos observações
 
 ## Exemplos
 
@@ -307,7 +312,9 @@ tidyr::relig_income |>
 
 # SRAG - Datasus
 
-Código Município, Código UF, Idade, comorbidade, teve SRAGS, óbito
+Dados de casos de SRAGs em 2023 no Brasil
+
+Nosso objetivo é limpar esse conjunto de dados, e decodificar cada variável
 
 ```{r, message= F}
 df_srag_pessoa = readr::read_csv2(here::here('./conjunto_de_dados/srag_2023.csv')) 
@@ -384,7 +391,8 @@ df_srag_pessoa = df_srag_pessoa |>
 
 Os dados foram retirados do [Tabnet](http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sih/cnv/niuf.def). 
 
-O conjunto de dados possui a ufs de referéncia, assim como o total de
+O conjunto de dados possui a ufs de referéncia, assim como o total de morbidade hospitalar
+
 
 ```{r}
 
@@ -414,6 +422,7 @@ df_morbidade |>
 ```
 
 
+DESAFIO CONCLUIDO!!
 
 ## Dados IBGE - Nascidos Vivos
 
@@ -451,6 +460,7 @@ df_nasc_vivos |>
   
 ```
 
+DESAFIO CONCLUIDO!!
 
 ## Dados - PRF Sudeste
 

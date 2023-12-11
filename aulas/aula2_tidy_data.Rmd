@@ -326,7 +326,6 @@ df_morbidade = readr::read_csv(here::here('./conjunto_de_dados/datasus.csv'),
                         n_max = 35,
                         locale = readr::locale(encoding = "latin1"))
 
-df_morbidade
 
 df_morbidade = df_morbidade |>
   janitor::remove_empty(which = 'rows') |>
@@ -347,18 +346,20 @@ Podemos chegar até essa etapa de uma limpeza dos dados com o que foi visto ness
 Um spoiler do que veremos na próxima aula, onde conheceremos as funções mutate, pivot_longer e pivot_wider
 
 ```{r}
- df_morbidade |>
+df_morbidade |>
   tidyr::pivot_longer(-c(ufs, Total)) |>
   dplyr::filter(!stringr::str_detect(value, '-')) |>
   dplyr::select(-Total) |>
   dplyr::rename(regiao = name,
                 casos = value) |>
   dplyr::mutate(ufs = ufs |>
-                  stringr::str_remove_all('.. ') |>
-                  tolower(),
+                  stringr::str_replace_all("\\.{2} ", "") |>
+                  tolower() |>
+                  abjutils::rm_accent(),
                 regiao = regiao |>
                   stringr::str_remove_all('\\d\\sRegião\\s') |>
-                  tolower())
+                  tolower()) |>
+  rmarkdown::paged_table()
 ```
 
 
@@ -381,6 +382,10 @@ df_nasc_vivos = readxl::read_xlsx(here::here('./conjunto_de_dados/ibge.xlsx')) |
                 nasc_vivo = total_estimado_de_nascidos_vivos,
                 subres_nasc_vivo = sub_registro_de_nascidos_vivos_ibge_percent,
                 subnot_nasc_vivos = subnotificacao_de_nascidos_vivos_ministerio_da_saude_percent)
+
+df_nasc_vivos |> 
+  head() |>
+  rmarkdown::paged_table()
 ```
 
 ## Dados - PRF Sudeste
@@ -396,6 +401,15 @@ df_prf = readr::read_csv2(here::here('./conjunto_de_dados/datatran2023.csv'),
                           locale = readr::locale(encoding = "latin1"))
 
 
+df_prf |>
+  head() |>
+  rmarkdown::paged_table()
+  
+```
+
+
+
+```{r}
 url = rvest::read_html('https://www.ibge.gov.br/explica/codigos-dos-municipios.php')
 
 web_scrap_ufs = data.frame(
@@ -406,7 +420,10 @@ web_scrap_ufs = data.frame(
       rvest::html_nodes('.numero a')|>
       rvest::html_text()
 )
-  
+
+web_scrap_ufs |> 
+  head() |>
+  rmarkdown::paged_table()
 ```
 
 
