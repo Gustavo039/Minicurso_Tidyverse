@@ -529,7 +529,6 @@ web_scrap_mun |> head()
 ```
 
 
-
 Com as tabelas já construídas, podemos juntá-las, para isso, iremos utilizar função **inner_join**.
 
 Veremos esses conceitos na próxima aula

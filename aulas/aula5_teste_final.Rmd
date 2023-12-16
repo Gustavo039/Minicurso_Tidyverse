@@ -1,0 +1,255 @@
+---
+title: "Aula 5 - Teste Final"
+format:
+  html:
+    theme: united
+    toc: true
+    toc-title: Conteúdo
+    number-sections: true
+    embed-resources: true
+    minimal: true
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+# Aula Final
+
+Seja bem-vindo a quinta e última aula do nosso minicurso de Fundamentos de Processamento de Dados Utilizando o Tidyverse! 
+
+Parabéns, você concluiu a jornada!!
+
+
+
+![](D:/Minicurso - Tidyverse/Minicurso_Tidyverse/figs/r_enco.png){width=70%}
+
+[Arte de @allison_horst](https://allisonhorst.com/allison-horst)
+
+# Mortalidade no Brasil
+
+Os dados trabalhados nessa aula final foram retirados do [DAENT - Departamento de Análise Epidemiológica e Vigilância de Doenças Não Transmissíveis](https://svs.aids.gov.br/daent/centrais-de-conteudos/paineis-de-monitoramento/mortalidade/cid10/), sendo dados da mortalidade (CID-10)
+
+* Nosso objetivo é ajustar os dados para uma análise estatística, onde desejamos comparar como os dados se apresentam nas diferentes regiões do Brasil. 
+
+Assim, as seguintes tabelas devem ser montadas
+
+* Dados Base
+  + Tabela base, com número de mortos por UF e por data. Deve conter chaves de referência para tabelas de UFs e Regiões
+  
+* Tabela UFs
+  + Tabela com informações das UFs, deve conter uma chave de UF, chave de Região, nome da UF e posteriormente a população daquela UF
+  
+* Tabela Regiões
+  + Tabela com informações das Regiões, deve conter uma chave de Região, nome da Região e posteriormente a população daquela Região
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+
+## Tabela de Dados Base
+
+Os dados baixados possuem a seguinte aparência
+
+```{r}
+read_csv2(here::here('./conjunto_de_dados/cid10_2023.csv')) |>
+  rmarkdown::paged_table()
+```
+
+Iremos construir as colunas: data, nome da uf, codigo do IBGE da UF e número de mortes
+
+```{r}
+df_cid10_uf = read_csv2(here::here('./conjunto_de_dados/cid10_2023.csv')) |>
+  clean_names() |>
+  select('abrangencia_nome':'junho') |>
+  pivot_longer('janeiro':'junho') |>
+  mutate(name = 
+           case_when(name ==  'janeiro' ~ '2023-01-01',
+                     name ==  'fevereiro' ~ '2023-02-01',
+                     name ==  'marco' ~ '2023-03-01',
+                     name ==  'abril' ~ '2023-04-01',
+                     name ==  'maio' ~ '2023-05-01',
+                     name ==  'junho' ~ '2023-06-01')) |>
+  rename(data = name,
+         mortes_cid10 = value) |>
+  dplyr::filter(abrangencia_nome == 'Unidade da federação') |>
+  rename(cod_uf = localidade_uid,
+         uf_nome = localidade_nome) |>
+  select(data, 
+         uf_nome,
+         cod_uf, 
+         mortes_cid10) |>
+  mutate(data = data |>
+           lubridate::ymd()) |>
+  mutate(uf_nome = uf_nome |>
+           stringr::str_replace_all(' ', "_") |>
+           tolower() |>
+           abjutils::rm_accent()
+        )
+
+df_cid10_uf |>
+  rmarkdown::paged_table()
+```
+
+
+## Tabela de Municípios e UFs
+
+* UFs
+
+```{r}
+library(rvest)
+url = rvest::read_html('https://www.ibge.gov.br/explica/codigos-dos-municipios.php')
+
+tbl_ufs = 
+  tibble(
+  uf = url|>
+      rvest::html_nodes('.uf td:nth-child(1) a')|>
+      rvest::html_text() |>
+      stringr::str_replace_all(' ', "_"),
+  cod_uf = url|>
+      rvest::html_nodes('.numero a')|>
+      rvest::html_text()
+) |>
+  dplyr::mutate(
+    cod_uf = cod_uf |> 
+      stringr::str_remove('ver municípios') |>
+      as.numeric(),
+    uf = uf |> 
+      tolower() |>
+      abjutils::rm_accent()
+    ) |>
+  mutate(cod_reg = cod_uf |>
+           as.character() |>
+           stringr::str_sub(1,1) |>
+           as.numeric())
+```
+
+* Tabela de Regiões
+
+```{r}
+tbl_regs = 
+  tibble(reg = 
+         c('norte', 
+           'nordeste', 
+           'sudeste', 
+           'sul', 
+           'centro_oeste'), 
+       cod_reg = 
+         c(1,2,3,4,5))
+```
+
+# Realizando a Análise
+
+```{r}
+df_cid10_regs = 
+  df_cid10_uf |>
+  inner_join(tbl_ufs, by = 'cod_uf') |>
+  inner_join(tbl_regs, by = 'cod_reg') |>
+  group_by(data, reg, cod_reg) |>
+  summarise(mortes_cid10 = sum(mortes_cid10))
+  
+```
+
+```{r}
+df_cid10_regs |>
+  ggplot(aes(x = data, y = mortes_cid10, color = reg)) +
+  geom_line()
+```
+
+Se desejássemos realizar um ajuste via tamanho populacional
+
+# Adicionando População
+
+Ajustando as tabelas de UFs e Regiões para terem a informação de tamanho populacional
+
+A população foi retirada do site do [IBGE](https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html), sendo estimativas populacionais para 2021
+
+```{r}
+pop_estim_uf = readxl::read_xls(here::here('./conjunto_de_dados/pop_2023.xls'),
+                 n_max = 35) |>
+  row_to_names(1) |>
+  remove_empty(which = 'cols') |>
+  clean_names() |>
+  filter(brasil_e_unidades_da_federacao |>
+           stringr::str_detect('Região') == F & 
+        brasil_e_unidades_da_federacao |>
+           stringr::str_detect('Brasil') == F) |>
+  rename(uf = brasil_e_unidades_da_federacao, 
+         pop = populacao_estimada) |>
+  mutate(uf = uf |>
+           abjutils::rm_accent() |>
+           tolower()|>
+           stringr::str_replace_all(' ', "_")) |>
+  mutate(pop = pop |>
+           stringr::str_remove_all('\\(\\d+\\)') |>
+           stringr::str_remove_all('\\.') |>
+           as.numeric()
+         )
+
+
+pop_estim_uf |> 
+  rmarkdown::paged_table()
+```
+
+
+```{r}
+tbl_ufs_pop = tbl_ufs |>
+  inner_join(pop_estim_uf, by = 'uf')
+
+tbl_ufs_pop |>
+  rmarkdown::paged_table()
+```
+
+
+```{r}
+tbl_regs_pop = tbl_ufs_pop |>
+  group_by(cod_reg) |>
+  summarise(pop = sum(pop)) |>
+  inner_join(tbl_regs, by = 'cod_reg') |>
+  relocate(reg, .before = pop)
+
+
+tbl_regs_pop |>
+  rmarkdown::paged_table()
+```
+
+```{r}
+df_cid10_regs = 
+  df_cid10_uf |>
+  inner_join(tbl_ufs_pop, by = 'cod_uf') |>
+  inner_join(tbl_regs_pop, by = 'cod_reg') |>
+  group_by(data, reg, cod_reg) |>
+  summarise(mortes_cid10 = sum(mortes_cid10)) |>
+  inner_join(tbl_regs_pop, by = 'cod_reg') |>
+  ungroup()
+
+df_cid10_regs |> 
+  rmarkdown::paged_table()
+```
+
+
+```{r}
+df_cid10_regs |>
+  mutate(mortes_pop = mortes_cid10/pop) |>
+  ggplot(aes(x = data, y = mortes_pop, color = reg.y)) +
+  geom_line()
+```
+
+# Chegou Sua Vez
+
+Agora o bastão está com você, estude alguma região do seu interesse. Prepare os dados dos estados dessa região, adicionando variáveis de seu interesse para melhor estudar a variável mortalidade
+
+A tarefa será aberta de maneira oficial na quarta-feira(20), onde você terá uma mês para realizá-la.
+
+Aproveite esse tempo para estudar, e lembre-se, qualquer dúvida, é so me mandar um email. 
+
+Muito obrigado pela parceira durante essas 2 semanas!
+
+Abraços e boas festas. 
+Gustavo
+
+
+
